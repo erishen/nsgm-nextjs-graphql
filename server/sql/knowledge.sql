@@ -2,7 +2,8 @@ use crm_demo;
 
 CREATE TABLE `knowledge` (
   `id` integer NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `name` varchar(100) DEFAULT '' COMMENT '名称',
+  `name` varchar(500) DEFAULT '' COMMENT '标题',
+  `content` text COMMENT '内容',
   `create_date` TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
   `update_date` TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
   PRIMARY KEY (`id`)

@@ -31,3 +31,47 @@ export const checkModalObj = (modalObj: {}, ignoreKeys: any = []) => {
   })
   return result
 }
+
+export const handleUserInput = (content: string) => { 
+  content = content || ''
+  return content.replace(/\"/g, "'").replace(/\\/g, "\\\\")
+}
+
+export const routerPush = (router: any, path: string) => { 
+  const nextConfig = getConfig()
+  const { publicRuntimeConfig } = nextConfig
+  const { prefix } = publicRuntimeConfig
+
+  if (router) { 
+    if (typeof window != 'undefined') { 
+      const locationHref = window.location.href
+
+      if (path.indexOf('/') != -1) {
+        if (locationHref.indexOf(prefix) == -1) {
+          router.push(path)
+        } else {
+          router.push(prefix + path)
+        }
+      } else { 
+        router.push(path)
+      }
+    }
+  }
+}
+
+export const getNewLink = (link: string) => { 
+  const nextConfig = getConfig()
+  const { publicRuntimeConfig } = nextConfig
+  const { prefix } = publicRuntimeConfig
+
+  let newLink = link
+  if (typeof window != 'undefined') { 
+    const locationHref = window.location.href
+
+    if (locationHref.indexOf(prefix) != -1) {
+      newLink = newLink.replace(prefix, '')
+      newLink = prefix + newLink
+    } 
+  }
+  return newLink
+}

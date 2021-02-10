@@ -6,16 +6,15 @@ module.exports = {
     `,
     mutation: `
         knowledgeAdd(data: KnowledgeAddInput): Int
-        knowledgeBatchAdd(datas: [KnowledgeAddInput]): Int
         knowledgeUpdate(id: Int, data: KnowledgeAddInput): Boolean
         knowledgeDelete(id: Int): Boolean
-        knowledgeBatchDelete(ids: [Int]): Boolean
     `,
     subscription: ``,
     type: `
         type Knowledge {
             id: Int
             name: String
+            content: String
         }
 
         type Knowledges {
@@ -25,6 +24,7 @@ module.exports = {
 
         input KnowledgeAddInput {
             name: String
+            content: String
         }
 
         input KnowledgeSearchInput {

@@ -1,7 +1,7 @@
 {
   "name": "nsgm-nextjs-graphql-project",
   "version": "1.0.0",
-  "description": "",
+  "description": "NSGM NEXTJS GRAPHQL DEMO PROJECT",
   "main": "index.js",
   "scripts": {
     "dev": "nsgm dev",
@@ -14,9 +14,13 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "preinstall": "npx npm-force-resolutions"
   },
-  "author": "",
+  "author": {
+    "name": "Erishen Sun",
+    "email": "leisun8309@gmail.com"
+  },
   "license": "ISC",
   "dependencies": {
+    "braft-editor": "^2.3.9",
     "nsgm-cli": "^1.0.6"
   },
   "devDependencies": {

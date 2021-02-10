@@ -9,18 +9,18 @@ export const SearchRow = styled.div`
   display: flex;
   flex: 1;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
 `
 
 export const ModalContainer = styled.div`
-  .line {
+  .line, .multiline {
     display: flex;
     flex: 1;
     flex-direction: row;
     justify-content: flex-start;
     align-items: flex-start;
-    height: 50px;
+    margin-bottom: 10px;
 
     label {
       display: flex;
@@ -32,7 +32,7 @@ export const ModalContainer = styled.div`
       margin-right: 5px;
     }
 
-    input {
+    input, span, textarea {
       flex: 1;
     }
 
@@ -48,5 +48,22 @@ export const ModalContainer = styled.div`
         align-items: center;
       }
     }
+  }
+
+  .line {
+    height: 40px;
+  }
+
+  .multiline {
+    height: 120px;
+  }
+
+  .rightline {
+    height: 30px;
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
   }
 `

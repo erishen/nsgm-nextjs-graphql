@@ -7,7 +7,7 @@ module.exports = {
     knowledge: ({ page = 0, pageSize = 10 }) => {
         return new Promise((resolve, reject)=>{
             getConnection().then((connection)=>{
-                const sql = 'SELECT id, name from knowledge LIMIT ? OFFSET ?'
+                const sql = 'SELECT id, name, content from knowledge LIMIT ? OFFSET ?'
                 const countSql = 'SELECT count(*) as counts from knowledge'
                 const values = [pageSize, page * pageSize]
 
@@ -36,7 +36,7 @@ module.exports = {
         console.log('knowledgeGet', id)
         return new Promise((resolve, reject)=>{
             getConnection().then((connection)=>{
-                let sql = 'SELECT id, name from knowledge WHERE 1=1'
+                let sql = 'SELECT id, name, content from knowledge WHERE 1=1'
                 let values = []
 
                 if(id != undefined){
@@ -73,7 +73,7 @@ module.exports = {
                     countsValues.push('%' + name + '%')
                 }
 
-                const sql = 'SELECT id, name from knowledge WHERE 1=1 ' + whereSql + ' LIMIT ? OFFSET ?'
+                const sql = 'SELECT id, name, content from knowledge WHERE 1=1 ' + whereSql + ' LIMIT ? OFFSET ?'
                 const countSql = 'SELECT count(*) as counts from knowledge WHERE 1=1 ' + whereSql
 
                 values.push(pageSize)
@@ -102,39 +102,12 @@ module.exports = {
     }, 
     knowledgeAdd: ({ data }) => {
         console.log('knowledgeAdd', data)
-        const { name } = data
+        const { name, content } = data
         return new Promise((resolve, reject)=>{
             getConnection().then((connection)=>{
 
-                let sql = 'INSERT INTO knowledge (name) values (?)'
-                let values = [name]
-                
-                console.log('sql', sql, values)
-                connection.query(sql, values, (error, results, fields) => {
-                    if (error) throw error
-                    console.log('results', results)
-
-                    resolve(results.insertId)
-                    connection.end()
-                })
-            })
-        })
-    },
-    knowledgeBatchAdd: (datas) => {
-        console.log('knowledgeBatchAdd', datas)
-        return new Promise((resolve, reject)=>{
-            getConnection().then((connection)=>{
-
-                let sql = 'INSERT INTO knowledge (name) values '
-                let values = []
-
-                _.each(datas, (item, index)=>{
-                    sql += '(?),'
-                    const { name } = item
-                    values.push(name)
-                })
-
-                sql = sql.substring(0, sql.length - 1)
+                let sql = 'INSERT INTO knowledge (name, content) values (?,?)'
+                let values = [name, content]
                 
                 console.log('sql', sql, values)
                 connection.query(sql, values, (error, results, fields) => {
@@ -149,7 +122,7 @@ module.exports = {
     },
     knowledgeUpdate: ({ id, data }) => {
         console.log('knowledgeUpdate', id, data)
-        const { name } = data
+        const { name, content } = data
         return new Promise((resolve, reject)=>{
             getConnection().then((connection)=>{
                 let sql = 'UPDATE knowledge SET'
@@ -158,6 +131,11 @@ module.exports = {
                 if(name != undefined){
                     sql += ' name=? '
                     values.push(name)
+                }
+
+                if(content != undefined){
+                    sql += ', content=? '
+                    values.push(content)
                 }
 
                 if(sql.indexOf('?') == -1){
@@ -194,38 +172,6 @@ module.exports = {
                     resolve(true)
                     connection.end()
                 })
-            })
-        })
-    },
-    knowledgeBatchDelete: ({ ids }) => {
-        console.log('knowledgeBatchDelete', ids)
-        return new Promise((resolve, reject)=>{
-            getConnection().then((connection)=>{
-                let sql = 'DELETE FROM knowledge WHERE id in ('
-
-                const idsLen = ids.length
-
-                if(idsLen > 0){
-                    for(let i = 0; i < idsLen; i++){
-                        sql += '?,'
-                    }
-    
-                    sql = sql.substring(0, sql.length - 1)
-                    sql += ')'
-    
-                    const values = ids
-                    console.log('sql', sql, values)
-    
-                    connection.query(sql, values, (error, results, fields) => {
-                        if (error) throw error
-                        console.log('results', results)
-    
-                        resolve(true)
-                        connection.end()
-                    })
-                }
-                else 
-                    reject()
             })
         })
     }

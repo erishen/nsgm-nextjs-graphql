@@ -1,34 +1,35 @@
 import React, { useEffect, useState } from 'react'
-import { ConfigProvider, Table, Modal, Button, Input, Space, Upload, message } from 'antd'
+import { ConfigProvider, Table, Modal, Button, Input, Space } from 'antd'
 import { Container, SearchRow, ModalContainer } from '../../client/styled/knowledge/manage'
 import { useDispatch, useSelector } from 'react-redux'
-import { getKnowledge, addKnowledge, modKnowledge, delKnowledge, updateSSRKnowledge, searchKnowledge, batchDelKnowledge } from '../../client/redux/knowledge/manage/actions'
+import { getKnowledge, addKnowledge, modKnowledge, delKnowledge, updateSSRKnowledge, searchKnowledge } from '../../client/redux/knowledge/manage/actions'
 import { getKnowledgeService } from '../../client/service/knowledge/manage'
 import { RootState } from '../../client/redux/store'
 import _ from 'lodash'
 import 'antd/dist/antd.css'
 import moment from 'moment'
 import locale from 'antd/lib/locale/zh_CN'
-import { handleXSS, checkModalObj } from '../../client/utils/common'
-import XLSX from 'xlsx'
-import { UploadOutlined } from '@ant-design/icons'
+import { handleXSS, routerPush, getNewLink } from '../../client/utils/common'
+import { useRouter } from 'next/router'
+import Link from 'next/link'
 
+const { TextArea } = Input
 const pageSize = 100
 const dateFormat = 'YYYY-MM-DD'
 const currentDate = moment().format(dateFormat)
 console.log('currentDate', currentDate)
 
-const keyTitles = {
-  name: '名称'
-}
-
 const Page = ({ knowledge }) => { 
+  const router = useRouter()
   const dispatch = useDispatch()
   const [isModalVisiable, setIsModalVisible] = useState(false)
   const [modalId, setModalId] = useState(0)
   const [modalName, setModalName] = useState('')
+  const [modalContent, setModalContent] = useState('')
+  const [modalUIContent, setModalUIContent] = useState('')
+  const [modalIsEditor, setModalIsEditor] = useState(false)
+
   const [searchName, setSearchName] = useState('')
-  const [batchDelIds, setBatchDelIds] = useState([])
 
   useEffect(() => {
     dispatch(updateSSRKnowledge(knowledge))
@@ -36,19 +37,26 @@ const Page = ({ knowledge }) => {
 
   const state = useSelector((state: RootState) => state)
   const { knowledgeManage } = state
-  console.log('knowledgeManage', knowledgeManage)
+  console.log('knowledgeManage', knowledgeManage, knowledge)
 
   if (!knowledgeManage.firstLoadFlag) { 
     knowledge = knowledgeManage.knowledge
   }
-  
+
   const { totalCounts, items:knowledgeItems } = knowledge
   console.log('knowledge', knowledge)
 
   _.each(knowledgeItems, (item, index) => { 
     const { id } = item
     item.key = id
+    let newContent = item.content.replace(/<[^>]+>/g, "")
+    if (newContent.length > 25) { 
+      newContent = newContent.substring(0, 25) + '...'
+    }
+    item.contentUI = newContent
   })
+
+  console.log('knowledgeItems', knowledgeItems)
 
   const dataSource = knowledgeItems
   const columns:any = [
@@ -61,7 +69,7 @@ const Page = ({ knowledge }) => {
       showSorterTooltip: false
     },
     {
-      title: keyTitles.name,
+      title: '标题',
       dataIndex: 'name',
       key: 'name',
       sorter: (a: any, b: any) => a.name.length - b.name.length,
@@ -69,11 +77,20 @@ const Page = ({ knowledge }) => {
       showSorterTooltip: false
     },
     {
+      title: '内容',
+      dataIndex: 'contentUI',
+      key: 'contentUI'
+    },
+    {
       title: '操作',
       dataIndex: '',
       render: (_:any, record:any) => {
         return (
           <Space>
+            <Button onClick={() => { 
+              console.log('record', record)
+              viewKnowledge(record)
+            }}>查看</Button>
             <Button onClick={() => { 
               console.log('record', record)
               updateKnowledge(record)
@@ -88,22 +105,34 @@ const Page = ({ knowledge }) => {
       }
     }
   ]
-
-  const rowSelection = {
-    onChange: (selectedRowKeys: React.Key[], selectedRows: any) => {
-      console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
-      setBatchDelIds(selectedRowKeys)
-    }
-  }
-
+  
   const createKnowledge = () => {
     setModalId(0)
     setModalName('')
+    setModalContent('')
+    setModalUIContent('')
+    setModalIsEditor(false)
     showModal()
   }
 
+  const viewKnowledge = (record:any) => { 
+    let { id } = record
+    routerPush(router, '/editor?id=' + id + '&view=1&from=/knowledge/manage')
+  }
+
   const updateKnowledge = (record:any) => { 
-    let { id, name } = record
+    let { id, name, content } = record
+    //console.log('content', content, (/<[^>]+>/g).test(content))
+
+    if ((/<[^>]+>/g).test(content)) {
+      setModalContent(content)
+      setModalUIContent(content.replace(/<[^>]+>/g, ""))
+      setModalIsEditor(true)
+    } else { 
+      setModalUIContent(content)
+      setModalContent(content)
+      setModalIsEditor(false)
+    }
 
     setModalId(id)
     setModalName(name)
@@ -127,91 +156,37 @@ const Page = ({ knowledge }) => {
     setIsModalVisible(true)
   }
 
-  const getMessageTitle = (key: string) => { 
-    let result = keyTitles[key]
-    if (result == undefined)
-      result = key
-    return result
-  }
-
   const handleOk = () => { 
     const modalObj = {
-      name: handleXSS(modalName)
+      name: handleXSS(modalName),
+      content: modalIsEditor ? modalContent : handleXSS(modalContent),
+      contentUI: modalUIContent,
+      isEditor: modalIsEditor
     }
+
     console.log('handleOk', modalObj)
 
-    const checkResult = checkModalObj(modalObj)
-
-    if (!checkResult) {
-      if (modalId == 0) {  // 新增
-        dispatch(addKnowledge(modalObj))
-      } else {
-        dispatch(modKnowledge(modalId, modalObj))
-      }
-      
-      setIsModalVisible(false)
+    if (modalId == 0) {  // 新增
+      dispatch(addKnowledge(modalObj))
     } else { 
-      message.info(getMessageTitle(checkResult.key) + checkResult.reason)
+      dispatch(modKnowledge(modalId, modalObj))
     }
+    
+    setIsModalVisible(false)
   }
 
   const handleCancel = () => { 
     setIsModalVisible(false)
   }
 
+  const createEditorKnowledge = () => { 
+    routerPush(router, '/editor?from=/knowledge/manage')
+  }
+
   const doSearch = () => { 
-    dispatch(searchKnowledge(0, pageSize, { name: handleXSS(searchName) }))
-  }
-
-  const exportKnowledge = () => { 
-    if (knowledgeItems.length > 0) {
-      const wb = XLSX.utils.book_new()
-      const jsonData = _.map(knowledgeItems, (item) => _.omit(item, ['key']))
-      //console.log('jsonData', jsonData)
-      const ws = XLSX.utils.json_to_sheet(jsonData)
-  
-      /* add worksheet to workbook */
-      XLSX.utils.book_append_sheet(wb, ws, "Knowledge")
-  
-      /* write workbook */
-      XLSX.writeFile(wb, "Knowledge.xlsx")
-    } else { 
-      message.info("没有数据无需导出")
-    }
-  }
-
-  const uploadProps = {
-    name: 'file',
-    action: '/rest/knowledge/import',
-    onChange(info:any) {
-      if (info.file.status !== 'uploading') {
-        console.log(info.file, info.fileList)
-      }
-
-      if (info.file.status === 'done') {
-        message.success(`${info.file.name} 文件上传成功`)
-        window.location.reload()
-      } else if (info.file.status === 'error') {
-        message.error(`${info.file.name} 文件上传失败`)
-      }
-    }
-  }
-
-  const batchDeleteKnowledge = () => { 
-    if (batchDelIds.length > 0) { 
-      Modal.confirm({
-        title: '提示',
-        content: '确认批量删除吗',
-        okText: '确认',
-        cancelText: '取消',
-        onOk : (e) => {
-          dispatch(batchDelKnowledge(batchDelIds))
-          Modal.destroyAll()
-        }
-      })
-    } else { 
-      message.info("没有数据不能批量删除")
-    }
+    dispatch(searchKnowledge(0, pageSize, {
+      name: handleXSS(searchName)
+    }))
   }
 
   return (  
@@ -222,25 +197,16 @@ const Page = ({ knowledge }) => {
             <Button type="primary" onClick={createKnowledge}>
               新增
             </Button>
+            <Button type="primary" onClick={createEditorKnowledge}>
+              新增富文本
+            </Button>
             <Input value={searchName} placeholder="" onChange={(e) => setSearchName(e.target.value)} />
             <Button type="primary" onClick={doSearch}>
               搜索
             </Button>
-            <Button type="primary" onClick={exportKnowledge}>
-              导出
-            </Button>
-            <Upload {...uploadProps}>
-              <Button icon={<UploadOutlined />}>导入</Button>
-            </Upload>
-            <Button type="primary" onClick={batchDeleteKnowledge}>
-              批量删除
-            </Button>
           </Space>
         </SearchRow>
-        <Table rowSelection={{
-            type: 'checkbox',
-            ...rowSelection,
-          }}  dataSource={dataSource} columns={columns} pagination={{
+        <Table dataSource={dataSource} columns={columns} pagination={{
               total: totalCounts,
               pageSize: pageSize,
               onChange: (page, pageSize) => { 
@@ -251,9 +217,19 @@ const Page = ({ knowledge }) => {
         <Modal title={(modalId == 0 ? "新增" : "修改") + " knowledge"} visible={isModalVisiable} onOk={handleOk} onCancel={handleCancel} okText="确认" cancelText="取消">
           <ModalContainer>
             <div className="line">
-              <label>{keyTitles.name}</label>
+              <label>标题</label>
               <Input value={modalName} placeholder="" onChange={(e) => setModalName(e.target.value)} />
             </div>
+            <div className="multiline">
+              <label>内容</label>
+              <TextArea placeholder="" disabled={modalIsEditor} autoSize={{ minRows: 3, maxRows: 5 }}
+                value={modalIsEditor ? modalUIContent : modalContent} onChange={(e) => setModalContent(e.target.value)} />
+            </div>
+            {modalIsEditor && <div className="rightline">
+              <Link href={getNewLink("/editor?id=" + modalId + "&from=/knowledge/manage")}>
+                <a>跳到富文本编辑器修改</a>
+              </Link>
+            </div>}
           </ModalContainer>
         </Modal>
       </ConfigProvider>
@@ -264,8 +240,8 @@ const Page = ({ knowledge }) => {
 Page.getInitialProps = async () => {
   let knowledge = null
 
-  await getKnowledgeService(0, pageSize).then((res: any) => { 
-    console.log('res', res)
+  await getKnowledgeService(0, pageSize).then((res: { data: any }) => { 
+    //console.log('res', res)
     const { data } = res
     knowledge = data.knowledge
   })

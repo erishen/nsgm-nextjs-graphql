@@ -1,5 +1,5 @@
 import * as types from './types'
-import { getKnowledgeService, addKnowledgeService, updateKnowledgeService, deleteKnowledgeService, searchKnowledgeService, batchDeleteKnowledgeService } from '../../../service/knowledge/manage'
+import { getKnowledgeService, addKnowledgeService, updateKnowledgeService, deleteKnowledgeService, searchKnowledgeByIdService, searchKnowledgeService } from '../../../service/knowledge/manage'
 
 export const getKnowledge = (page=0, pageSize=10) => (
   dispatch: (arg0: {
@@ -12,7 +12,7 @@ export const getKnowledge = (page=0, pageSize=10) => (
   })
 
   getKnowledgeService(page, pageSize)
-    .then((res: any) => {
+    .then((res: { data: any }) => {
       //console.log('action_res', res)
       const { data } = res
       dispatch({
@@ -40,7 +40,7 @@ export const searchKnowledge = (page=0, pageSize=10, data: any) => (
   })
 
   searchKnowledgeService(page, pageSize, data)
-    .then((res: any) => {
+    .then((res: { data: any }) => {
       //console.log('action_res', res)
       const { data } = res
       dispatch({
@@ -82,7 +82,7 @@ export const addKnowledge = (obj:any) => (
   })
 
   addKnowledgeService(obj)
-    .then((res: any) => {
+    .then((res: { data: any }) => {
       //console.log('action_res', res)
       const { data } = res
       const knowledge = {
@@ -114,7 +114,7 @@ export const modKnowledge = (id: number, obj: any) => (
   })
 
   updateKnowledgeService(id, obj)
-    .then((res: any) => {
+    .then((res: { data: any }) => {
       console.log('action_res', res)
       const knowledge = {
         id,
@@ -145,7 +145,7 @@ export const delKnowledge = (id: number) => (
   })
 
   deleteKnowledgeService(id)
-    .then((res: any) => {
+    .then((res: { data: any }) => {
       console.log('action_res', res)
 
       dispatch({
@@ -162,30 +162,31 @@ export const delKnowledge = (id: number) => (
     })
 }
 
-export const batchDelKnowledge = (ids:any) => (
+export const searchKnowledgeById = (id: number) => (
   dispatch: (arg0: {
     type: string
-    payload?: { ids: any }
+    payload?: { knowledge: any }
   }) => void
 ) => {
   dispatch({
-    type: types.BATCH_DEL_KNOWLEDGE
+    type: types.SEARCH_KNOWLEDGE_BYID
   })
 
-  batchDeleteKnowledgeService(ids)
-    .then((res: any) => {
-      console.log('action_res', res)
+  searchKnowledgeByIdService(id)
+    .then((res: { data: any }) => {
+      //console.log('action_res', res)
+      const { data } = res
 
       dispatch({
-        type: types.BATCH_DEL_KNOWLEDGE_SUCCEEDED,
+        type: types.SEARCH_KNOWLEDGE_BYID_SUCCEEDED,
         payload: {
-          ids
+          knowledge: data.knowledgeGet
         }
       })
     })
     .catch(() => {
       dispatch({
-        type: types.BATCH_DEL_KNOWLEDGE_FAILED
+        type: types.SEARCH_KNOWLEDGE_BYID_FAILED
       })
     })
 }
