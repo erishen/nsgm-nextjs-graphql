@@ -18,7 +18,6 @@ const Page = () => {
   renderArr.push('- 数据库采用 Mysql, 配置见 mysql.config.js')
   renderArr.push('- 项目配置见 project.config.js')
   renderArr.push('- Next 框架配置见 next.config.js')
-  renderArr.push('- [Demo 网站](https://nsgm.erisl.top/)')
   
   renderArr.push('## 命令')
   renderArr.push('- nsgm init    初始化项目')
@@ -40,6 +39,7 @@ const Page = () => {
   renderArr.push('- [富文本](http://127.0.0.1:8080/editor?from=/knowledge/manage)')
 
   renderArr.push('## 线上 DEMO 链接')
+  renderArr.push('- [首页](https://nsgm.erisl.top)')
   renderArr.push('- [知识库](https://nsgm.erisl.top/knowledge/manage.html)')
 
   let html = ''

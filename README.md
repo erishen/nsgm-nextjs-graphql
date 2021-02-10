@@ -20,4 +20,5 @@
 - [富文本](http://127.0.0.1:8080/editor?from=/knowledge/manage)
 
 ## 线上 DEMO 链接
+- [首页](https://nsgm.erisl.top)
 - [知识库](https://nsgm.erisl.top/knowledge/manage.html)
