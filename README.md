@@ -14,7 +14,10 @@
 - action:     在 create/delete 的时候使用， 默认 manage, 跟在 controller 后面， 譬如 npm run create|delete math test
 
 
-## 已有链接
+## 本地链接
 - [首页](http://127.0.0.1:8080)
 - [知识库](http://127.0.0.1:8080/knowledge/manage)
 - [富文本](http://127.0.0.1:8080/editor?from=/knowledge/manage)
+
+## 线上 DEMO 链接
+- [知识库](https://nsgm.erisl.top/knowledge/manage.html)

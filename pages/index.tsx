@@ -34,10 +34,13 @@ const Page = () => {
   renderArr.push('- controller: 在 create/delete 的时候使用， 必须有。譬如：nsgm create/delete math')
   renderArr.push('- action:     在 create/delete 的时候使用， 默认 manage, 跟在 controller 后面， 譬如 nsgm create/delete math test')
 
-  renderArr.push('## 已有链接')
+  renderArr.push('## 本地链接')
   renderArr.push('- [首页](http://127.0.0.1:8080)')
   renderArr.push('- [知识库](http://127.0.0.1:8080/knowledge/manage)')
   renderArr.push('- [富文本](http://127.0.0.1:8080/editor?from=/knowledge/manage)')
+
+  renderArr.push('## 线上 DEMO 链接')
+  renderArr.push('- [知识库](https://nsgm.erisl.top/knowledge/manage.html)')
 
   let html = ''
   _.each(renderArr, (item, index) => { 
