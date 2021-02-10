@@ -15,6 +15,6 @@
 
 
 ## 已有链接
-- http://127.0.0.1:8080
-- http://127.0.0.1:8080/knowledge/manage
-- 
+- [首页](http://127.0.0.1:8080)
+- [知识库](http://127.0.0.1:8080/knowledge/manage)
+- [富文本](http://127.0.0.1:8080/editor?from=/knowledge/manage)
