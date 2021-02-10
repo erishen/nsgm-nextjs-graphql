@@ -39,7 +39,7 @@ const Page = ({ knowledge }) => {
   const { knowledgeManage } = state
   console.log('knowledgeManage', knowledgeManage, knowledge)
 
-  if (!knowledgeManage.firstLoadFlag) { 
+  if (!knowledgeManage.firstLoadFlag || !knowledge) { 
     knowledge = knowledgeManage.knowledge
   }
 
@@ -237,19 +237,23 @@ const Page = ({ knowledge }) => {
   )
 }
 
-Page.getInitialProps = async () => {
-  let knowledge = null
+Page.getInitialProps = async ({ req }) => {
+  if (req) {
+    let knowledge = null
 
-  await getKnowledgeService(0, pageSize).then((res: { data: any }) => { 
-    //console.log('res', res)
-    const { data } = res
-    knowledge = data.knowledge
-  })
-
-  console.log('knowledge-getInitialProps', knowledge)
-
-  return {
-    knowledge
+    await getKnowledgeService(0, pageSize).then((res: { data: any }) => {
+      //console.log('res', res)
+      const { data } = res
+      knowledge = data.knowledge
+    })
+  
+    console.log('knowledge-getInitialProps', knowledge)
+  
+    return {
+      knowledge
+    }
+  } else { 
+    return {}
   }
 }
 
