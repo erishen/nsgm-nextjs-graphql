@@ -8,7 +8,6 @@
     "build": "nsgm build",
     "start": "nsgm start",
     "export": "nsgm export",
-    "init": "nsgm init",
     "create": "nsgm create",
     "delete": "nsgm delete",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -18,6 +17,10 @@
     "name": "Erishen Sun",
     "email": "leisun8309@gmail.com"
   },
+  "bugs": {
+    "url": "https://github.com/erishen/nsgm-nextjs-graphql/issues"
+  },
+  "homepage": "https://github.com/erishen/nsgm-nextjs-graphql#readme",
   "license": "ISC",
   "dependencies": {
     "braft-editor": "^2.3.9",

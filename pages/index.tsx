@@ -11,7 +11,8 @@ const Page = () => {
 
   const renderArr = []
 
-  renderArr.push('# NSGM CLI')
+  renderArr.push('# NSGM NEXTJS GRAPHQL DEMO PROJECT')
+  renderArr.push('- 使用 nsgm-cli 全局安装 npm install -g nsgm-cli 即可使用，第一步 nsgm init your_project_name 初始化项目，第二步 npm run create your_controller your_action(default: manage), 第三步 npm run dev 访问页面')
   renderArr.push('- 技术栈: [Next](https://github.com/vercel/next.js), [Styled-components](https://github.com/styled-components/styled-components), [Graphql](https://graphql.org/), [Mysql](https://www.mysql.com/) (命名取首字母 NSGM)')
   renderArr.push('- 全栈架构，代码模板生成，快速开发')
   renderArr.push('- 数据库采用 Mysql, 配置见 mysql.config.js')
